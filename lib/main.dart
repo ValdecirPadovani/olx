@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'file:///C:/Users/valdecir.junior/AndroidStudioProjects/olx/lib/views/Home.dart';
+import 'file:///C:/Users/valdecir.junior/AndroidStudioProjects/olx/lib/views/Login.dart';
+import 'package:olx/RouteGenerator.dart';
+import 'package:olx/views/Anuncios.dart';
 
   final ThemeData temaPadrao = ThemeData(
     primaryColor: Color(0xff9c27b0),
@@ -9,8 +11,10 @@ import 'file:///C:/Users/valdecir.junior/AndroidStudioProjects/olx/lib/views/Hom
 void main() {
   runApp(MaterialApp(
     title: "OLX",
-    home: Home(),
+    home: Anuncios(),
     theme: temaPadrao,
+    initialRoute: "/",
+    onGenerateRoute: RouteGenerator.generateRoute,
     debugShowCheckedModeBanner: false,
   ));
 }

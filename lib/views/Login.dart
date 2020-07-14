@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:olx/models/Usuario.dart';
 import 'package:olx/views/ImputCustomizado.dart';
 
-class Home extends StatefulWidget {
+class Login extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _LoginState createState() => _LoginState();
 }
 
-class _HomeState extends State<Home> {
+class _LoginState extends State<Login> {
 
   TextEditingController _controllerEmail = TextEditingController(text: "valdecir@gmail.com");
   TextEditingController _controllerSenha = TextEditingController(text: "1234567");
@@ -25,7 +25,7 @@ class _HomeState extends State<Home> {
         email: usuario.email,
         password: usuario.senha)
         .then((firebaseUser) => {
-          
+          Navigator.pushReplacementNamed(context, "/")
     });
   }
 
@@ -34,7 +34,9 @@ class _HomeState extends State<Home> {
     auth.signInWithEmailAndPassword(
         email: usuario.email,
         password: usuario.senha)
-        .then((firebaseUser) => {});
+        .then((firebaseUser) => {
+          Navigator.pushReplacementNamed(context, "/")
+    });
   }
 
   _validarCampos(){
