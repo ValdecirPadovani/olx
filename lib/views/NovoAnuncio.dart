@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:olx/views/widgets/BotaoCustomizado.dart';
+import 'package:validadores/Validador.dart';
 
 class NovoAnuncio extends StatefulWidget {
   @override
@@ -13,9 +15,14 @@ class NovoAnuncio extends StatefulWidget {
 class _NovoAnuncioState extends State<NovoAnuncio> {
 
   List<File> _listImagens = List();
+  List<DropdownMenuItem<String>> _listItensDorpEstados = List();
+  List<DropdownMenuItem<String>> _listItensDorpCategorias = List();
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _piker = ImagePicker();
   File _image;
+
+  String _itemSelecionadoEstado;
+  String _itemSelecionadoCategoria;
 
   Future _selecionarImagemGaleria() async {
     final imagemSelecionada = await _piker.getImage(source: ImageSource.gallery);
@@ -28,6 +35,43 @@ class _NovoAnuncioState extends State<NovoAnuncio> {
         _listImagens.add(_image);
       });
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _carregarItensDropdown();
+  }
+
+  _carregarItensDropdown(){
+
+    _listItensDorpCategorias.add(
+        DropdownMenuItem(child: Text("Automóvel"), value: "auto",)
+    );
+
+    _listItensDorpCategorias.add(
+        DropdownMenuItem(child: Text("Imóvel"), value: "imovel",)
+    );
+
+    _listItensDorpCategorias.add(
+        DropdownMenuItem(child: Text("Eletrônicos"), value: "eletro",)
+    );
+
+    _listItensDorpCategorias.add(
+        DropdownMenuItem(child: Text("Moda"), value: "moda",)
+    );
+
+    _listItensDorpCategorias.add(
+        DropdownMenuItem(child: Text("Esportes"), value: "esportes",)
+    );
+
+
+   for(var estados in Estados.listaEstadosAbrv){
+    _listItensDorpEstados.add(
+        DropdownMenuItem(child: Text(estados), value: estados,)
+    );
+   }
   }
 
   @override
@@ -152,8 +196,50 @@ class _NovoAnuncioState extends State<NovoAnuncio> {
                 ),
                 Row(
                   children: <Widget>[
-                    Text("Estado"),
-                    Text("Categoria"),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: DropdownButtonFormField(
+                          value: _itemSelecionadoEstado,
+                          hint: Text("Estados"),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20
+                          ),
+                          items: _listItensDorpEstados,
+                          validator: (valor){
+                            return Validador().add(Validar.OBRIGATORIO, msg: "Campo obrigatório").valido(valor);
+                          },
+                          onChanged: (valor){
+                            setState(() {
+                              _itemSelecionadoEstado = valor;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: DropdownButtonFormField(
+                          value: _itemSelecionadoCategoria,
+                          hint: Text("Categorias"),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20
+                          ),
+                          items: _listItensDorpCategorias,
+                          validator: (valor){
+                            return Validador().add(Validar.OBRIGATORIO, msg: "Campo obrigatório").valido(valor);
+                          },
+                          onChanged: (valor){
+                            setState(() {
+                              _itemSelecionadoCategoria = valor;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 Text("Caixa de textos"),
