@@ -13,11 +13,11 @@ class _AnunciosState extends State<Anuncios> {
 
     switch(itemEscolhido){
       case "Meus anúncios":
-        Navigator.pushNamed(context, "meus-anuncios");
+        Navigator.pushNamed(context, "/meus-anuncios");
         break;
 
       case "Entrar / Cadastrar":
-        Navigator.pushNamed(context, "login");
+        Navigator.pushNamed(context, "/login");
         break;
 
       case "Deslogar":
