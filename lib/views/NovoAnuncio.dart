@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:brasil_fields/brasil_fields.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,7 @@ class _NovoAnuncioState extends State<NovoAnuncio> {
   final ImagePicker _piker = ImagePicker();
   File _image;
   Anuncio _anuncio;
+  BuildContext _dialogContext;
 
   String _itemSelecionadoEstado;
   String _itemSelecionadoCategoria;
@@ -82,9 +85,42 @@ class _NovoAnuncioState extends State<NovoAnuncio> {
 
   _salvarAnuncio() async{
 
+    _abrirDialog(_dialogContext);
+
     await _uploadImagens();
 
-    print("Lista de imagens: ${_anuncio.fotos.toString()}");
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+    String idUsuarioLogado = usuarioLogado.uid;
+    Firestore db = Firestore.instance;
+    db.collection("meus_anuncios")
+    .document(idUsuarioLogado)
+        .collection("anuncios")
+        .document(_anuncio.id)
+        .setData(_anuncio.toMap())
+        .then((_) {
+          Navigator.pop(_dialogContext);
+          Navigator.pop(context);
+    });
+  }
+
+  _abrirDialog(BuildContext context){
+    showDialog(
+        context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context){
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CircularProgressIndicator(),
+                SizedBox(height: 20,),
+                Text("Salvando anúncio...")
+              ],
+            ),
+          );
+      }
+    );
 
 
   }
@@ -348,6 +384,7 @@ class _NovoAnuncioState extends State<NovoAnuncio> {
                   onPressed: (){
                     if(_formKey.currentState.validate()){
                           _formKey.currentState.save();
+                          _dialogContext = context;
                           _salvarAnuncio();
                     }
                   },

@@ -21,6 +21,21 @@ class Anuncio{
     this.fotos = [];
   }
 
+  Map<String, dynamic> toMap(){
+
+    Map<String, dynamic> map ={
+      "id" : this.id,
+      "estado" : this.estado,
+      "categoria" : this.categoria,
+      "titulo" : this.titulo,
+      "preco" : this.preco,
+      "telefone" : this.telefone,
+      "descricao" : this.descricao,
+      "fotos" : this.fotos
+    };
+    return map;
+  }
+
   String get id => _id;
 
   set id(String value) {
