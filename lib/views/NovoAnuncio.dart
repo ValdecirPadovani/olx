@@ -50,7 +50,7 @@ class _NovoAnuncioState extends State<NovoAnuncio> {
     // TODO: implement initState
     super.initState();
     _carregarItensDropdown();
-    _anuncio = Anuncio();
+    _anuncio = Anuncio.gerarId();
   }
 
   _carregarItensDropdown(){

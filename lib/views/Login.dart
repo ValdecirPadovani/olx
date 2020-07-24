@@ -100,6 +100,7 @@ class _LoginState extends State<Login> {
                   controller: _controllerSenha,
                   hint: "Senha",
                   obscure: true,
+                  maxLines: 1,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
