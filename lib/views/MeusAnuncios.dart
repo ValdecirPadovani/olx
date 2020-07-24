@@ -40,7 +40,16 @@ class _MeusAnunciosState extends State<MeusAnuncios> {
 
   _removerAnuncio(String idAnuncio){
     Firestore db = Firestore.instance;
-    db.collection("meus_anuncios").document(_idUsuarioLogado).collection("anuncios").document(idAnuncio).delete();
+    db.collection("meus_anuncios")
+        .document(_idUsuarioLogado)
+        .collection("anuncios")
+        .document(idAnuncio)
+        .delete().then((_) {
+
+          db.collection("anuncios")
+              .document(idAnuncio)
+              .delete();
+    });
   }
 
   @override

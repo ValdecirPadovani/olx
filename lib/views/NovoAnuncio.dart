@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:olx/models/Anuncio.dart';
+import 'package:olx/util/Configuracoes.dart';
 import 'package:olx/views/widgets/BotaoCustomizado.dart';
 import 'package:olx/views/widgets/ImputCustomizado.dart';
 import 'package:validadores/Validador.dart';
@@ -55,32 +56,9 @@ class _NovoAnuncioState extends State<NovoAnuncio> {
 
   _carregarItensDropdown(){
 
-    _listItensDorpCategorias.add(
-        DropdownMenuItem(child: Text("Automóvel"), value: "auto",)
-    );
+    _listItensDorpCategorias = Configuracoes.getCategorias();
 
-    _listItensDorpCategorias.add(
-        DropdownMenuItem(child: Text("Imóvel"), value: "imovel",)
-    );
-
-    _listItensDorpCategorias.add(
-        DropdownMenuItem(child: Text("Eletrônicos"), value: "eletro",)
-    );
-
-    _listItensDorpCategorias.add(
-        DropdownMenuItem(child: Text("Moda"), value: "moda",)
-    );
-
-    _listItensDorpCategorias.add(
-        DropdownMenuItem(child: Text("Esportes"), value: "esportes",)
-    );
-
-
-   for(var estados in Estados.listaEstadosAbrv){
-    _listItensDorpEstados.add(
-        DropdownMenuItem(child: Text(estados), value: estados,)
-    );
-   }
+    _listItensDorpEstados = Configuracoes.getEstados();
   }
 
   _salvarAnuncio() async{
@@ -99,8 +77,14 @@ class _NovoAnuncioState extends State<NovoAnuncio> {
         .document(_anuncio.id)
         .setData(_anuncio.toMap())
         .then((_) {
-          Navigator.pop(_dialogContext);
-          Navigator.pop(context);
+
+          db.collection("anuncios")
+              .document(_anuncio.id)
+              .setData(_anuncio.toMap())
+              .then((_) {
+                  Navigator.pop(_dialogContext);
+                  Navigator.pop(context);
+              });
     });
   }
 
