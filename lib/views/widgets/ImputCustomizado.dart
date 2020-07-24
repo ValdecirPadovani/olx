@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ImputCustomizado extends StatelessWidget {
 
@@ -7,22 +8,31 @@ class ImputCustomizado extends StatelessWidget {
   final bool obscure;
   final bool autofocus;
   final TextInputType type;
+  final int maxLines;
+  final List<TextInputFormatter> inputFormatters;
+  final Function(String) validator;
 
   ImputCustomizado({
     @required this.controller,
     @required this.hint,
     this.obscure = false,
     this.autofocus = false,
-    this.type = TextInputType.text
+    this.type = TextInputType.text,
+    this.inputFormatters,
+    this.maxLines,
+    this.validator
 });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: this.controller,
       obscureText: this.obscure,
       autofocus: this.autofocus,
       keyboardType: this.type,
+      inputFormatters: this.inputFormatters,
+      validator: this.validator,
+      maxLines: this.maxLines,
       style: TextStyle(fontSize: 20),
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
