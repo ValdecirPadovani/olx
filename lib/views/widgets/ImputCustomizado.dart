@@ -11,6 +11,7 @@ class ImputCustomizado extends StatelessWidget {
   final int maxLines;
   final List<TextInputFormatter> inputFormatters;
   final Function(String) validator;
+  final Function(String) onSaved;
 
   ImputCustomizado({
     @required this.controller,
@@ -20,7 +21,8 @@ class ImputCustomizado extends StatelessWidget {
     this.type = TextInputType.text,
     this.inputFormatters,
     this.maxLines,
-    this.validator
+    this.validator,
+    this.onSaved
 });
 
   @override
@@ -33,6 +35,7 @@ class ImputCustomizado extends StatelessWidget {
       inputFormatters: this.inputFormatters,
       validator: this.validator,
       maxLines: this.maxLines,
+      onSaved: this.onSaved,
       style: TextStyle(fontSize: 20),
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
