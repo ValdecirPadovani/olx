@@ -1,6 +1,11 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:olx/models/Anuncio.dart';
 import 'package:olx/util/Configuracoes.dart';
+import 'package:olx/views/widgets/ItemAnuncio.dart';
 
 class Anuncios extends StatefulWidget {
   @override
@@ -11,6 +16,9 @@ class _AnunciosState extends State<Anuncios> {
   List<String> itensMenu = [];
   String _itenselecionadoEstado;
   String _itenselecionadoCategoria;
+  final _controler = StreamController<QuerySnapshot>.broadcast();
+
+
   List<DropdownMenuItem<String>> _listItensDorpEstados = List();
   List<DropdownMenuItem<String>> _listItensDorpCategorias = List();
 
@@ -41,6 +49,7 @@ class _AnunciosState extends State<Anuncios> {
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseUser usuarioLogado = await auth.currentUser();
 
+    print("***VERIFICAR USUARIO LOGADO***");
     if(usuarioLogado == null){
       itensMenu = ["Entrar / Cadastrar"];
     }else{
@@ -50,9 +59,41 @@ class _AnunciosState extends State<Anuncios> {
 
   _carregarItensDropdown(){
 
+    print("****CRIANDO DOPDOWN****");
     _listItensDorpCategorias = Configuracoes.getCategorias();
 
     _listItensDorpEstados = Configuracoes.getEstados();
+  }
+
+  Future<Stream<QuerySnapshot>> _adicionarListenerAnuncios() async {
+
+    Firestore db = Firestore.instance;
+    Stream<QuerySnapshot> stream = db
+        .collection("anuncios")
+        .snapshots();
+
+    stream.listen((dados){
+      _controler.add(dados);
+    });
+
+  }
+
+  Future<Stream<QuerySnapshot>> _filtrarListenerAnuncios() async {
+
+    Firestore db = Firestore.instance;
+    Query query = db.collection("anuncios");
+
+    if(_itenselecionadoEstado != null ){
+      query = query.where("estado", isEqualTo: _itenselecionadoEstado);
+    }
+    if(_itenselecionadoCategoria != null ){
+      query = query.where("categoria", isEqualTo: _itenselecionadoCategoria);
+    }
+    Stream<QuerySnapshot> stream = query.snapshots();
+
+    stream.listen((dados){
+      _controler.add(dados);
+    });
   }
 
   @override
@@ -60,10 +101,21 @@ class _AnunciosState extends State<Anuncios> {
     super.initState();
     _carregarItensDropdown();
     _verificaUsuarioLogado();
+    _adicionarListenerAnuncios();
   }
 
   @override
   Widget build(BuildContext context) {
+
+    var carregandoDados = Center(
+      child: Column(
+        children: <Widget>[
+          Text("Carregando anúncios"),
+          CircularProgressIndicator()
+        ],
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text("OLX"),
@@ -101,6 +153,7 @@ class _AnunciosState extends State<Anuncios> {
                         onChanged: (estado){
                           setState(() {
                             _itenselecionadoEstado = estado;
+                            _filtrarListenerAnuncios();
                           });
                         },
                       ),
@@ -126,6 +179,7 @@ class _AnunciosState extends State<Anuncios> {
                         onChanged: (categoria){
                           setState(() {
                             _itenselecionadoCategoria = categoria;
+                            _filtrarListenerAnuncios();
                           });
                         },
                       ),
@@ -133,6 +187,50 @@ class _AnunciosState extends State<Anuncios> {
                   ),
                 )
               ],
+            ),
+            StreamBuilder(
+                stream: _controler.stream,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                      return carregandoDados;
+                      break;
+                    case ConnectionState.active:
+                    case ConnectionState.done:
+
+                      QuerySnapshot querySnapshot = snapshot.data;
+                      if(querySnapshot.documents.length == 0){
+                        return Container(
+                          padding: EdgeInsets.all(25),
+                          child: Text("Nenhum anúncio!", style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
+                          ),),
+                        );
+                      }
+
+                      return Expanded(
+                        child: ListView.builder(
+                          itemCount: querySnapshot.documents.length,
+                            itemBuilder: (_, indice){
+                              List<DocumentSnapshot> anuncios = querySnapshot.documents.toList();
+                              DocumentSnapshot documentSnapshot = anuncios[indice];
+                              Anuncio anuncio = Anuncio.fromDocumentSnapshot(documentSnapshot);
+                              return ItemAnuncio(
+                                anuncio: anuncio,
+                                onTapItem: (){
+                                  Navigator.pushNamed(context, "/detalhes-anuncio", arguments: anuncio);
+                                },
+                              );
+                            }
+
+                        ),
+                      );
+
+                  }
+                  return Container();
+                }
             ),
           ],
         ),
